@@ -1,0 +1,23 @@
+{
+  "name": "buangyuk-functions",
+  "version": "1.0.0",
+  "description": "Firebase Cloud Functions backend for BuangYuk",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "firebase deploy --only functions"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.11.0",
+    "firebase-functions": "^4.5.0",
+    "geofire-common": "^5.2.0",
+    "uuid": "^9.0.0",
+    "validator": "^13.9.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

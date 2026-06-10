@@ -1,0 +1,14 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Only authenticated users can upload waste scan images
+    match /waste_scans/{uid}/{allPaths=**} {
+      // Write: user must be logged in and match path uid, file must be image and size <= 5 MB
+      allow write: if request.auth != null && request.auth.uid == uid && request.resource.size < 5 * 1024 * 1024 && request.resource.contentType.matches('image/.*');
+      // Read: owner, admin, or government can read
+      allow read: if request.auth != null && (request.auth.uid == uid || request.auth.token.role in ['admin','government']);
+    }
+    // Default deny for everything else
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

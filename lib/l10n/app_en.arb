@@ -1,0 +1,35 @@
+{
+  "@@locale": "en",
+  "appTitle": "BuangYuk",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "loginTitle": "Log In to Your Account",
+  "@loginTitle": {
+    "description": "Login page title"
+  },
+  "loginSubtitle": "Welcome back to BuangYuk!",
+  "@loginSubtitle": {
+    "description": "Login page subtitle"
+  },
+  "emailLabel": "Email Address",
+  "@emailLabel": {
+    "description": "Label for email input"
+  },
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Label for password input"
+  },
+  "loginButton": "Log In",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "registerPrompt": "Don't have an account?",
+  "@registerPrompt": {
+    "description": "Text to navigate to register page"
+  },
+  "registerLink": "Register Now",
+  "@registerLink": {
+    "description": "Link text to navigate to register page"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "@@locale": "id",
+  "appTitle": "BuangYuk",
+  "@appTitle": {
+    "description": "Judul aplikasi"
+  },
+  "loginTitle": "Masuk ke Akun Anda",
+  "@loginTitle": {
+    "description": "Judul halaman login"
+  },
+  "loginSubtitle": "Selamat datang kembali di BuangYuk!",
+  "@loginSubtitle": {
+    "description": "Subjudul halaman login"
+  },
+  "emailLabel": "Alamat Email",
+  "@emailLabel": {
+    "description": "Label untuk input email"
+  },
+  "passwordLabel": "Kata Sandi",
+  "@passwordLabel": {
+    "description": "Label untuk input password"
+  },
+  "loginButton": "Masuk",
+  "@loginButton": {
+    "description": "Teks tombol login"
+  },
+  "registerPrompt": "Belum punya akun?",
+  "@registerPrompt": {
+    "description": "Teks untuk menuju halaman daftar"
+  },
+  "registerLink": "Daftar Sekarang",
+  "@registerLink": {
+    "description": "Teks link menuju halaman daftar"
+  }
+}

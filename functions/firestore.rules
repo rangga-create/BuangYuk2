@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function hasFullAccess() {
+      return getRole() in ['super_admin', 'admin'];
+    }
+    function hasManagerAccess() {
+      return getRole() in ['super_admin', 'government_admin', 'tps_manager', 'admin'];
+    }
+
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || hasManagerAccess());
+      allow update: if request.auth != null && (request.auth.uid == uid || hasFullAccess());
+      allow create: if request.auth != null;
+      allow delete: if hasFullAccess();
+    }
+
+    match /pickups/{pickupId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && (
+        resource.data.citizenId == request.auth.uid ||
+        resource.data.collectorId == request.auth.uid ||
+        hasManagerAccess()
+      );
+      allow update: if request.auth != null && (
+        (request.auth.uid == resource.data.citizenId && request.resource.data.status == 'cancelled') ||
+        request.auth.uid == resource.data.collectorId ||
+        hasManagerAccess()
+      );
+      allow delete: if hasFullAccess();
+    }
+
+    match /pickup_status_logs/{logId} {
+      allow create: if request.auth != null && (request.auth.uid == request.resource.data.changedBy || hasManagerAccess());
+      allow read: if request.auth != null && (
+        resource.data.changedBy == request.auth.uid || hasManagerAccess()
+      );
+      allow update, delete: if false;
+    }
+
+    match /collector_locations/{collectorId} {
+      allow create, update: if request.auth.uid == collectorId && getRole() == 'collector';
+      allow read: if request.auth != null;
+      allow delete: if hasFullAccess();
+    }
+
+    match /rewards/{uid} {
+      allow read: if request.auth.uid == uid || hasManagerAccess();
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth.uid == uid || hasFullAccess();
+      allow delete: if hasFullAccess();
+    }
+
+    match /reward_transactions/{txnId} {
+      allow read: if request.auth.uid == resource.data.uid || hasManagerAccess();
+      allow create: if request.auth.uid == resource.data.uid;
+      allow update, delete: if hasFullAccess();
+    }
+
+    match /leaderboards/{uid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth.uid == uid || hasFullAccess();
+      allow delete: if hasFullAccess();
+    }
+
+    match /waste_scans/{scanId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth.uid == resource.data.uid || hasManagerAccess();
+      allow update, delete: if hasFullAccess();
+    }
+
+    match /schedules/{scheduleId} {
+      allow read: if request.auth != null;
+      allow write: if hasManagerAccess();
+    }
+
+    match /tps/{tpsId} {
+      allow read: if request.auth != null;
+      allow write: if hasManagerAccess();
+    }
+
+    match /notifications/{notifId} {
+      allow read: if request.auth.uid == resource.data.uid || hasManagerAccess();
+      allow write: if true;
+      allow delete: if request.auth.uid == resource.data.uid || hasFullAccess();
+    }
+
+    match /admin_stats/{docId} {
+      allow read: if hasManagerAccess();
+      allow write: if false;
+    }
+
+    match /admin_daily_stats/{docId} {
+      allow read: if hasManagerAccess();
+      allow write: if false;
+    }
+
+    match /reports/{reportId} {
+      allow read: if hasManagerAccess();
+      allow write: if hasManagerAccess();
+    }
+  }
+}

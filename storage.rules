@@ -1,0 +1,48 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helpers for Role-Based Access Control
+    function isCitizen() { return request.auth.token.role == 'citizen'; }
+    function isCollector() { return request.auth.token.role == 'collector'; }
+    function isTPSManager() { return request.auth.token.role == 'tps_manager'; }
+    function isGovAdmin() { return request.auth.token.role == 'government_admin'; }
+    function isSuperAdmin() { return request.auth.token.role == 'super_admin'; }
+    function hasManagerAccess() { return isSuperAdmin() || isGovAdmin() || isTPSManager(); }
+
+    // Citizen profile images
+    match /users/{uid}/profile/{fileName} {
+      allow read: if true;
+      allow write: if request.auth.uid == uid || hasManagerAccess();
+    }
+
+    // Pickup waste images
+    match /pickups/{pickupId}/{fileName} {
+      allow read: if request.auth != null; // Any logged in user can read pickup images (for matching/verification)
+      allow create: if request.auth != null;
+      allow update, delete: if hasManagerAccess();
+    }
+
+    // Waste scan images
+    match /waste_scans/{uid}/{fileName} {
+      allow read: if request.auth.uid == uid || hasManagerAccess();
+      // create is handled by Cloud Functions which bypasses these rules, but for client direct upload:
+      allow create: if request.auth.uid == uid;
+      allow update, delete: if hasManagerAccess();
+    }
+
+    // Collector verification documents
+    match /verifications/{uid}/{fileName} {
+      allow read: if request.auth.uid == uid || hasManagerAccess();
+      allow write: if request.auth.uid == uid;
+    }
+
+    // Generated Reports (CSV/JSON)
+    match /reports/{fileName} {
+      // Cloud Functions bypass rules to write here.
+      // Admins can read directly if they have the path, otherwise they use Signed URLs.
+      allow read: if hasManagerAccess();
+      allow write: if false; // Server only
+    }
+  }
+}
