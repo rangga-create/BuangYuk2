@@ -1,0 +1,8 @@
+# Default ProGuard settings for Android
+# Keep the classes required by the Android framework and Flutter engine
+-keep class io.flutter.embedding.** { *; }
+-keep class io.flutter.plugin.** { *; }
+-keep class io.flutter.** { *; }
+-dontwarn io.flutter.embedding.**
+-dontwarn io.flutter.plugin.**
+-dontwarn io.flutter.**

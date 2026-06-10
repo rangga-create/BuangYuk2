@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -9,6 +12,13 @@ plugins {
 }
 
 android {
+    // Load keystore properties from repository root if available
+    val keystorePropertiesFile = rootProject.file("../key.properties")
+    val keystoreProperties = Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    }
+
     namespace = "com.example.buang_yuk"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
@@ -32,12 +42,32 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+    
+        signingConfigs {
+            create("release") {
+                // Load from key.properties when available
+                if (keystoreProperties.isNotEmpty()) {
+                    keyAlias = keystoreProperties.getProperty("keyAlias")
+                    keyPassword = keystoreProperties.getProperty("keyPassword")
+                    storeFile = file(keystoreProperties.getProperty("storeFile"))
+                    storePassword = keystoreProperties.getProperty("storePassword")
+                } else {
+                    // fallback to environment variables or defaults
+                    keyAlias = System.getenv("KEY_ALIAS") ?: "buangyuk"
+                    keyPassword = System.getenv("KEY_PASSWORD") ?: "buangyukpass"
+                    storeFile = file(System.getenv("KEYSTORE_PATH") ?: "keystore.jks")
+                    storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "buangyukstore"
+                }
+            }
+        }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Use release signing config when available (loaded from key.properties)
+                signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+                isMinifyEnabled = true
+                isShrinkResources = true
+                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }

@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Keystore and key properties (do not commit)
+key.properties
+android/app/buangyuk_keystore.jks
